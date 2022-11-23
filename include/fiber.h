@@ -21,7 +21,7 @@ public:
     };
 
 
-    Fiber(std::function<void()> func, size_t stack_size);
+    Fiber(std::function<void()> func, size_t stack_size = 4096);
     ~Fiber();
 
     /**
@@ -41,7 +41,13 @@ public:
      */
     void Reset(std::function<void()> func);
 
+    State GetState() {
+        return state_;
+    }
 
+    bool isTerminate() {
+        return state_ == TERM || state_ == EXCEPT;
+    }
 
 public:
     static Fiber::ptr GetThis();
