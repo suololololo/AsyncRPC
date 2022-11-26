@@ -156,4 +156,13 @@ void Fiber::EnableFiber() {
     }
 }
 
+
+uint64_t Fiber::GetFiberId() {
+    if(t_fiber) {
+        return t_fiber->GetId();
+    }
+    return 0;
+
+}
+
 }
