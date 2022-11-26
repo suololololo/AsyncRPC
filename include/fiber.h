@@ -49,6 +49,7 @@ public:
         return state_ == TERM || state_ == EXCEPT;
     }
 
+    uint64_t GetId() const { return id_;}
 public:
     static Fiber::ptr GetThis();
 
@@ -64,6 +65,7 @@ public:
     // 协程执行函数
     static void MainFunc();    
 
+    static uint64_t GetFiberId();
 private:
     Fiber();
 

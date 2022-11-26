@@ -11,6 +11,7 @@ set (LIB_SRC
     src/scheduler.cc
     src/thread.cc
     src/utils.cc
+    src/log.cc
 )
 set(LIB_LIB pthread)
 
