@@ -11,7 +11,7 @@ public:
     ~Thread();
     void join();
     const pid_t getId() const { return id_;}
-    const std::string& getName() const {return name_;}
+    static const std::string& getName();
 
     static void* run(void *arg);
     static Thread *GetThis();

@@ -15,7 +15,7 @@ set (LIB_SRC
 )
 set(LIB_LIB pthread)
 
-
+set(CMAKE_BUILD_TYPE "Debug")
 # file(GLOB_RECURSE SRC_LIST ${PROJECT_SOURCE_DIR}/src/*.cc )
 add_library(util ${LIB_SRC})
 target_include_directories(util PUBLIC ${PROJECT_SOURCE_DIR}/include)
@@ -29,3 +29,7 @@ target_link_libraries(test_fiber PUBLIC util)
 add_executable(test_scheduler ${PROJECT_SOURCE_DIR}/test/test_scheduler.cc)
 target_include_directories(test_scheduler PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_scheduler PUBLIC util)
+
+add_executable(test_log ${PROJECT_SOURCE_DIR}/test/test_log.cc)
+target_include_directories(test_log PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_log PUBLIC util)

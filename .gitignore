@@ -2,3 +2,5 @@ build/*
 
 test/*
 *.dot
+
+.vscode/*
