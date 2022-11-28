@@ -58,5 +58,11 @@ void Thread::SetName(const std::string& name) {
 }
 
 
-
+const std::string& Thread::getName() {
+    if (t_thread) {
+        return t_thread->name_;
+    }
+    SetName("main");
+    return t_thread_name;
+}
 }
