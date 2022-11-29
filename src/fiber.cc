@@ -4,7 +4,7 @@
 #include <atomic>
 #include <exception>
 namespace RPC {
-
+static Logger::ptr logger = RPC_LOG_ROOT();
 static std::atomic<uint64_t> s_fiber_count{0};
 static std::atomic<uint64_t> s_fiber_id{0};
 
@@ -26,7 +26,12 @@ Fiber::Fiber() {
     }
 
     s_fiber_count++;
+    RPC_LOG_DEBUG(logger) << "Fiber::Fiber main";
 }
+
+
+
+
 
 
 Fiber::Fiber(std::function<void()> func, size_t stack_size)
@@ -54,6 +59,10 @@ Fiber::Fiber(std::function<void()> func, size_t stack_size)
     ctx_.uc_stack.ss_sp = stack_;
 
     makecontext(&ctx_, MainFunc, 0);
+
+
+   RPC_LOG_DEBUG(logger) << "Fiber::Fiber id=" << id_;
+
 }
 Fiber::~Fiber() {
     --s_fiber_count;
@@ -66,9 +75,13 @@ Fiber::~Fiber() {
         RPC_ASSERT(state_==EXEC);
         RPC_ASSERT(!func_);
         if (t_fiber == this) {
-            t_fiber = nullptr;
+            SetThis(nullptr);
         }
     }
+
+   RPC_LOG_DEBUG(logger) << "Fiber::~Fiber id=" << id_
+                             << " total=" << s_fiber_count;
+
 }
 
 
@@ -108,7 +121,7 @@ void Fiber::Reset(std::function<void()> func) {
     ctx_.uc_stack.ss_size = stack_size_;
     ctx_.uc_stack.ss_sp = stack_;
     makecontext(&ctx_, MainFunc, 0);
-
+    state_ = INIT;
 }
 Fiber::ptr Fiber::GetThis() {
     return t_fiber->shared_from_this();
@@ -151,7 +164,7 @@ void Fiber::MainFunc() {
 void Fiber::EnableFiber() {
     if (!t_fiber) {
         Fiber::ptr main_fiber(new Fiber);
-        SetThis(main_fiber.get());
+        // SetThis(main_fiber.get());
         t_thread_fiber = main_fiber;
     }
 }

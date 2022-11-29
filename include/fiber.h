@@ -21,7 +21,7 @@ public:
     };
 
 
-    Fiber(std::function<void()> func, size_t stack_size = 4096);
+    Fiber(std::function<void()> func, size_t stack_size = 128 * 1024);
     ~Fiber();
 
     /**

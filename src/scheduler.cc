@@ -1,9 +1,12 @@
 #include "scheduler.h"
 #include "utils.h"
 #include "macro.h"
+#include "log.h"
 #include <iostream>
+#include <signal.h>
 namespace RPC {
 
+static Logger::ptr logger = RPC_LOG_ROOT();
 static thread_local Scheduler* t_scheduler = nullptr; 
 
 
@@ -41,15 +44,7 @@ void Scheduler::Start() {
 }
 
 void Scheduler::Stop() {
-    //等到没有任务的时候再停止
-    while (true) {
-        MutexType::Lock lock(mutex_);
-        if (tasks_.empty()) {
-            stop_ = true;
-            break;
-        }
-    }
-    // stop_ = true;
+    stop_ = true;
     for(int i = 0; i < threadCount_; ++i) {
         Notify();
     }
@@ -66,6 +61,7 @@ void Scheduler::Run() {
      * 
      * 
      */
+    signal(SIGPIPE, SIG_IGN);
     SetThis();
     RPC::Fiber::EnableFiber();
     Fiber::ptr fiber;
@@ -125,6 +121,7 @@ void Scheduler::Run() {
                 Submit(fiber);
                 fiber.reset();
             } else if (fiber->isTerminate()) {
+                //重复利用协程空间
                 fiber->Reset(nullptr);
             } else {
                 // 释放协程
@@ -162,16 +159,18 @@ bool Scheduler::Stopping() {
      */
 
 void Scheduler::Wait() {
-
-    std::cout << "idle" << std::endl;
+    RPC_LOG_INFO(logger) << "idle";
     while (!Stopping()) {
         RPC::Fiber::YieldToHold();
     }
-    std::cout << "idle fiber exit" << std::endl;
+    RPC_LOG_DEBUG(logger) << "idle fiber exit";
+
 }
 
 void Scheduler::Notify() {
-    std::cout << "notify" << std::endl;
+    RPC_LOG_INFO(logger) << "notify";
+    //TODO notify action
+
 }
 
 

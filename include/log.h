@@ -29,6 +29,8 @@ if (logger->getLevel() <= level) \
 #define RPC_LOG_FMT_ERROR(logger, fmt, ...) RPC_LOG_FMT_LEVEL(logger, RPC::LogLevel::ERROR, fmt, __VA_ARGS__)
 #define RPC_LOG_FMT_FATAL(logger, fmt, ...) RPC_LOG_FMT_LEVEL(logger, RPC::LogLevel::FATAL, fmt, __VA_ARGS__)
 #define RPC_LOG_ROOT() RPC::LogMgr::GetInstance()->GetRoot()
+#define RPC_LOG_NAME(name) RPC::LogMgr::GetInstance()->GetInstance(name)
+
 
 namespace RPC {
 class Logger;
