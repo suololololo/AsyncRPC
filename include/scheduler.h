@@ -27,11 +27,11 @@ public:
     void Stop();
 
     template<class FiberOrCb>
-    Scheduler* Submit(FiberOrCb& fc, int thread = -1) {
+    Scheduler* Submit(FiberOrCb&& fc, int thread = -1) {
         bool need_notify = false;
         {
             MutexType::Lock lock(mutex_);
-            need_notify = SubmitNoLock(fc, thread);
+            need_notify = SubmitNoLock(std::forward<FiberOrCb>(fc), thread);
         }
         if (need_notify) {
             Notify();

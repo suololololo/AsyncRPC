@@ -1,5 +1,6 @@
 #ifndef __MACRO_H__
 #define __MACRO_H__
+#include "log.h"
 #include <assert.h>
 #include <iostream>
 #if defined(__GNUC__) || defined(__llvm__)
@@ -18,7 +19,7 @@ if (RPC_UNLIKELY(!(x))) { \
 
 #define RPC_ASSERT2(x, str) \
 if (RPC_UNLIKELY(!(x))) { \
-    std::cout << str << std::endl;\
+    RPC_LOG_ERROR(RPC_LOG_ROOT()) << str;\
     assert(x);\
     exit(1);\
 }

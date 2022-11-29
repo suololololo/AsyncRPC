@@ -5,9 +5,9 @@ namespace RPC {
 
 static thread_local Thread * t_thread = nullptr;
 static thread_local std::string t_thread_name = "UNKNOWN";
-Thread::Thread(const std::string &name, std::function<void()> cb) {
+Thread::Thread(const std::string &name, std::function<void()> cb):name_(name) {
     name_ = name_.empty() ? "UNKNOWN": name;
-    func_ = cb;
+    func_ = std::move(cb);
     int res = pthread_create(&thread_, nullptr, &run, this);
     if (res) {
         throw std::logic_error("pthread_create error");
