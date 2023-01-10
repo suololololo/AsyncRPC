@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 project(RPC VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD_REQUIRED True)
+# set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic  -std=c++11  -Wall -Werror -Wno-deprecated -Wno-unused-function ")
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
 
 
 set (LIB_SRC 
@@ -12,6 +17,7 @@ set (LIB_SRC
     src/thread.cc
     src/utils.cc
     src/log.cc
+    src/byte_array.cc
 )
 set(LIB_LIB pthread)
 
@@ -33,3 +39,12 @@ target_link_libraries(test_scheduler PUBLIC util)
 add_executable(test_log ${PROJECT_SOURCE_DIR}/test/test_log.cc)
 target_include_directories(test_log PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_log PUBLIC util)
+
+add_executable(test_byte_array ${PROJECT_SOURCE_DIR}/test/test_byte_array.cc)
+target_include_directories(test_byte_array PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_byte_array PUBLIC util)
+
+
+add_executable(test_serializer ${PROJECT_SOURCE_DIR}/test/rpc/test_serializer.cc)
+target_include_directories(test_serializer PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_serializer PUBLIC util)
