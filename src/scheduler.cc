@@ -10,8 +10,9 @@ static Logger::ptr logger = RPC_LOG_ROOT();
 static thread_local Scheduler* t_scheduler = nullptr; 
 
 
+
 Scheduler::Scheduler(size_t threads, const std::string &name)
-:threadCount_(threads), name_(name), activeThreads_(0), idleThreads_(0){
+:threadCount_(threads), activeThreads_(0), idleThreads_(0), name_(name){
     stop_ = true;
     t_scheduler = this;
 
@@ -35,7 +36,7 @@ void Scheduler::Start() {
     RPC_ASSERT(threads_.empty());
     threadIds_.resize(threadCount_);
     threads_.resize(threadCount_);
-    for (int i = 0; i < threadCount_; ++i) {
+    for (size_t i = 0; i < threadCount_; ++i) {
         threads_[i].reset(new RPC::Thread(name_+"_"+std::to_string(i), [this]{
             this->Run();
         }));
@@ -45,7 +46,7 @@ void Scheduler::Start() {
 
 void Scheduler::Stop() {
     stop_ = true;
-    for(int i = 0; i < threadCount_; ++i) {
+    for(size_t i = 0; i < threadCount_; ++i) {
         Notify();
     }
     std::vector<Thread::ptr> vec;
