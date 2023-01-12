@@ -197,10 +197,8 @@ public:
 
     size_t getReadableSize() const { return size_ - position_;}
     
-
-private:
-
-    /**
+    size_t getPosition() const { return position_; }
+        /**
      * @brief 核心API，将buf中的数据写入指定内存块，写入大小为size
      * 
      * @param buf 
@@ -215,7 +213,7 @@ private:
      * @param size 
      */
     void read(void *buf, size_t size);
-
+private:
 
     void read(void *buf, size_t size, size_t position) const;
 
