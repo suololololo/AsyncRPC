@@ -1,15 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated  -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
+set(CMAKE_C_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c11 -Wall -Wno-deprecated  -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
 
 project(RPC VERSION 1.0 LANGUAGES CXX)
 
-# set(CMAKE_CXX_STANDARD 11)
-# set(CMAKE_CXX_STANDARD_REQUIRED True)
-# set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic  -std=c++11  -Wall -Werror -Wno-deprecated -Wno-unused-function ")
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-set(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
-set(CMAKE_C_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations")
-
 
 set (LIB_SRC 
     src/fiber.cc
@@ -47,4 +45,5 @@ target_link_libraries(test_byte_array PUBLIC util)
 
 add_executable(test_serializer ${PROJECT_SOURCE_DIR}/test/rpc/test_serializer.cc)
 target_include_directories(test_serializer PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(test_serializer PUBLIC ${PROJECT_SOURCE_DIR}/include/rpc)
 target_link_libraries(test_serializer PUBLIC util)
