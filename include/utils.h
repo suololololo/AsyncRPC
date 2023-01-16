@@ -40,6 +40,15 @@ ByteSwap(T value) {
 #define RPC_BYTE_ORDER RPC_LITTLE_ENDIAN
 #endif
 
+template<class T>
+T EndianCast(T value) {
+    if (sizeof(T) == sizeof(uint8_t) || RPC_BYTE_ORDER == RPC_BIG_ENDIAN) {
+        return value;
+    } else {
+        return ByteSwap(value);
+    }
+}
+
 }
 
 
