@@ -73,6 +73,7 @@ protected:
 
     virtual void Wait();
 
+    bool hasIdleThreads() { return idleThreads_ > 0;}
 private:
     /**
      * @brief 调度任务结构体
@@ -134,11 +135,12 @@ protected:
     std::atomic<size_t> activeThreads_;
     // 空闲线程数
     std::atomic<size_t> idleThreads_;
+    bool stop_;
 private:
     std::list<ScheduleTask> tasks_;
     std::vector<Thread::ptr> threads_;
     std::string name_;
-    bool stop_;
+
     MutexType mutex_;
 
 

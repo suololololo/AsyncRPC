@@ -15,6 +15,8 @@ namespace RPC {
 pid_t GetThreadId();
 
 uint64_t GetFiberId();
+uint64_t GetCurrentMS();
+uint64_t GetCurrentUS();
 
 template <class T>
 typename std::enable_if<sizeof(T) == sizeof(uint64_t), T>::type
