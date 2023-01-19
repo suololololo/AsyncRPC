@@ -17,6 +17,8 @@ set (LIB_SRC
     src/log.cc
     src/byte_array.cc
     src/address.cc
+    src/io_manager.cc
+    src/timer.cc
 )
 set(LIB_LIB pthread)
 
@@ -52,3 +54,7 @@ target_link_libraries(test_serializer PUBLIC util)
 add_executable(test_address ${PROJECT_SOURCE_DIR}/test/test_address.cc)
 target_include_directories(test_address PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_address PUBLIC util)
+
+add_executable(test_iomanager ${PROJECT_SOURCE_DIR}/test/test_iomanager.cc)
+target_include_directories(test_iomanager PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_iomanager PUBLIC util)
