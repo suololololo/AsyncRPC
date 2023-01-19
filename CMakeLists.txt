@@ -16,6 +16,7 @@ set (LIB_SRC
     src/utils.cc
     src/log.cc
     src/byte_array.cc
+    src/address.cc
 )
 set(LIB_LIB pthread)
 
@@ -45,5 +46,9 @@ target_link_libraries(test_byte_array PUBLIC util)
 
 add_executable(test_serializer ${PROJECT_SOURCE_DIR}/test/rpc/test_serializer.cc)
 target_include_directories(test_serializer PUBLIC ${PROJECT_SOURCE_DIR}/include)
-target_include_directories(test_serializer PUBLIC ${PROJECT_SOURCE_DIR}/include/rpc)
 target_link_libraries(test_serializer PUBLIC util)
+
+
+add_executable(test_address ${PROJECT_SOURCE_DIR}/test/test_address.cc)
+target_include_directories(test_address PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_address PUBLIC util)
