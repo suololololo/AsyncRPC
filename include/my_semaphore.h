@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <stdexcept>
 namespace RPC {
-class Semaphore:Noncopyable{
+class Semaphore: public Noncopyable{
 public:
     Semaphore(uint32_t count) {
         if (sem_init(&sem_, 0, count)) {

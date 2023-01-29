@@ -171,6 +171,41 @@ bool IOManager::cancelEvent(int fd, Event event) {
     return true;
 }
 
+bool IOManager::cancelAllEvent(int fd) {
+    RWMutexType::ReadLock lock(mutex_);
+    if ((int)fdContext_.size() <= fd) {
+        return false;
+    }
+    auto fdctx = fdContext_[fd];
+    lock.unlock();
+    FdContext::MutexType::Lock lock1(fdctx->mutex);
+    if (!fdctx->events) {
+        return false;
+    }
+    int op = EPOLL_CTL_MOD;
+    epoll_event ep_event;
+    memset(&ep_event, 0, sizeof(epoll_event));
+    ep_event.data.fd = fdctx->fd;
+    ep_event.data.ptr = fdctx;
+    ep_event.events = 0;
+    int rt = epoll_ctl(epollfd_, op, fdctx->fd, &ep_event);
+    if (rt != 0) {
+        RPC_LOG_ERROR(logger) << "epoll_ctl(" << epollfd_ << ", " << op << ", " << fd << ", "
+                << ep_event.events << "):" << rt << " (" << errno << ") (" << strerror(errno) << ")";
+        return false;         
+    }
+    if (fdctx->events & READ) {
+        fdctx->triggerEvent(READ);
+        --pendingEventCount_;
+    }
+    if (fdctx->events & WRITE) {
+        fdctx->triggerEvent(WRITE);
+        --pendingEventCount_;
+    }
+    RPC_ASSERT(fdctx->events == 0);
+    return true;
+}
+
 IOManager::FdContext::EventContext& IOManager::FdContext::getEventContext(Event event) {
     if (event == READ) {
         return read;
@@ -306,8 +341,6 @@ void IOManager::onTimerInsertedAtFront() {
 }
 
 IOManager* IOManager::GetThis() {
-    static IOManager s_scheduler(4, "default scheduler name");
-    IOManager *iom = dynamic_cast<IOManager *>(Scheduler::GetThis());
-    return iom? iom :&s_scheduler;
+    return dynamic_cast<IOManager *>(Scheduler::GetThis());
 }
 }

@@ -19,8 +19,13 @@ set (LIB_SRC
     src/address.cc
     src/io_manager.cc
     src/timer.cc
+    src/hook.cc
+    src/fd_manager.cc
 )
-set(LIB_LIB pthread)
+set(LIB_LIB 
+    pthread
+    dl
+    )
 
 set(CMAKE_BUILD_TYPE "Debug")
 # file(GLOB_RECURSE SRC_LIST ${PROJECT_SOURCE_DIR}/src/*.cc )
@@ -58,3 +63,7 @@ target_link_libraries(test_address PUBLIC util)
 add_executable(test_iomanager ${PROJECT_SOURCE_DIR}/test/test_iomanager.cc)
 target_include_directories(test_iomanager PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_iomanager PUBLIC util)
+
+add_executable(test_hook ${PROJECT_SOURCE_DIR}/test/test_hook.cc)
+target_include_directories(test_hook PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_hook PUBLIC util)

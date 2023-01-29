@@ -27,7 +27,7 @@ private:
 };
 
 
-class Mutex :Noncopyable{
+class Mutex : public Noncopyable{
 public:
     typedef ScopedLock<Mutex> Lock;
     Mutex() {
@@ -114,7 +114,7 @@ private:
     bool is_lock_;
 };
 
-class RWMutex : Noncopyable {
+class RWMutex : public Noncopyable {
 public:
     typedef ReadScopeLock<RWMutex> ReadLock;
     typedef WriteScopeLock<RWMutex> WriteLock;
