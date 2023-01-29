@@ -33,6 +33,7 @@ private:
     struct Comparator {
         bool operator() (const Timer::ptr &lhs, const Timer::ptr &rhs) const;
     };
+public:
     /**
      * @brief 取消定时器（删除定时器）
      * 

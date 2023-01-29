@@ -2,6 +2,7 @@
 #include "utils.h"
 #include "macro.h"
 #include "log.h"
+#include "hook.h"
 #include <iostream>
 #include <signal.h>
 namespace RPC {
@@ -62,6 +63,7 @@ void Scheduler::Run() {
      * 
      * 
      */
+    set_hook_enable(true);
     signal(SIGPIPE, SIG_IGN);
     SetThis();
     RPC::Fiber::EnableFiber();

@@ -30,7 +30,14 @@ public:
      * @brief 删除并触发事件
      */
     bool cancelEvent(int fd, Event event);
-
+    /**
+     * @brief 取消一个句柄上的所有事件并触发
+     * 
+     * @param fd 
+     * @return true 
+     * @return false 
+     */
+    bool cancelAllEvent(int fd);
     static IOManager* GetThis() ;
 protected:
 
