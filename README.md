@@ -19,9 +19,16 @@
 4.RPC调用过程，将参数序列化成tuple，再传输。被调用方接收到数据时，反序列化成tuple。
 
 ### IOManager 模块
-
+基于协程调度器，加入了epoll_wait，监听各种事件，并使用协程调度器进行事件处理。
 ### Hook模块
-基于dlsym函数实现hook机制
+基于dlsym函数实现hook机制。
+#### hook函数
+* socket创建相关函数(socket, connect, accept)
+* socket IO相关函数(send, recv)
+* fd相关函数(fcntl, ioctl)
 
 将IO函数改为异步逻辑
 只针对socket句柄进行改造。当调用原始io函数，数据未准备好时，根据句柄是否有超时时间要求，添加条件定时器，当超时了且条件还成立时，调用定时器的回调函数。回调函数具体表现为取消对该socket句柄事件的监听，并返回出连接超时的错误。添加完计时器后，监听该socket句柄的事件，挂起协程。当事件触发时（即数据准备好了），切换回该协程读数据。
+
+### socket模块
+由于socket需要绑定各种地址

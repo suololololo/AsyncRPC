@@ -21,6 +21,7 @@ set (LIB_SRC
     src/timer.cc
     src/hook.cc
     src/fd_manager.cc
+    src/socket.cc
 )
 set(LIB_LIB 
     pthread
@@ -67,3 +68,7 @@ target_link_libraries(test_iomanager PUBLIC util)
 add_executable(test_hook ${PROJECT_SOURCE_DIR}/test/test_hook.cc)
 target_include_directories(test_hook PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_hook PUBLIC util)
+
+add_executable(test_socket ${PROJECT_SOURCE_DIR}/test/test_socket.cc)
+target_include_directories(test_socket PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_socket PUBLIC util)
