@@ -215,6 +215,10 @@ private:
     sockaddr_in6 addr_;
 };
 
+/**
+ * @brief Unix本地套接字，用于本机网络通信，地址是由路径名标识
+ * 
+ */
 class UnixAddress : public Address {
 public:
     typedef std::shared_ptr<UnixAddress> ptr;

@@ -1,5 +1,4 @@
 #include "address.h"
-#include "utils.h"
 #include "log.h"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -298,9 +297,9 @@ socklen_t IPv4Address::getSockAddrLen() const {
 std::ostream &IPv4Address::insert(std::ostream &os) const {
     uint32_t addr = NetworkToHost(addr_.sin_addr.s_addr);
     os << ((addr >> 24) & 0xff) << "."
-       << ((addr >> 16) & 0xff) << "."
-       << ((addr >> 8) & 0xff) << "."
-       << (addr & 0xff);
+    << ((addr >> 16) & 0xff) << "."
+    << ((addr >> 8) & 0xff) << "."
+    << (addr & 0xff);
     os << ":" << NetworkToHost(addr_.sin_port);
     return os;
 } 
