@@ -6,35 +6,35 @@
 namespace RPC {
 static Logger::ptr logger = RPC_LOG_ROOT();
 Socket::ptr Socket::CreateTCP(Address::ptr address) {
-    return Socket::ptr (new Socket(address->getFamily(), TCP, IPPROTO_TCP));
+    return Socket::ptr (new Socket(address->getFamily(), TCP, 0));
 }
 Socket::ptr Socket::CreateUDP(Address::ptr address) {
-    return Socket::ptr (new Socket(address->getFamily(), UDP, IPPROTO_UDP));
+    return Socket::ptr (new Socket(address->getFamily(), UDP, 0));
 }
 
 
 Socket::ptr Socket::CreateTCPSocket() {
-    return Socket::ptr (new Socket(IPV4, TCP, IPPROTO_TCP));
+    return Socket::ptr (new Socket(IPV4, TCP, 0));
 }
 
 Socket::ptr Socket::CreateUDPSocket() {
-    return Socket::ptr(new Socket(IPV4, UDP, IPPROTO_UDP));
+    return Socket::ptr(new Socket(IPV4, UDP, 0));
 }
 
 Socket::ptr Socket::CreateTCPSocket6() {
-    return Socket::ptr(new Socket(IPV6, TCP, IPPROTO_TCP));
+    return Socket::ptr(new Socket(IPV6, TCP, 0));
 }
 
 Socket::ptr Socket::CreateUDPSocket6() {
-    return Socket::ptr(new Socket(IPV6, UDP, IPPROTO_UDP));
+    return Socket::ptr(new Socket(IPV6, UDP, 0));
 }
 
 Socket::ptr Socket::CreateUnixTCPSocket() {
-    return Socket::ptr(new Socket(UNIX, TCP, IPPROTO_TCP));
+    return Socket::ptr(new Socket(UNIX, TCP, 0));
 }
 
 Socket::ptr Socket::CreateUnixUDPSocket() {
-    return Socket::ptr(new Socket(UNIX, UDP, IPPROTO_UDP));
+    return Socket::ptr(new Socket(UNIX, UDP, 0));
 }  
 
 
@@ -79,7 +79,7 @@ uint64_t Socket::getSendTimeout() const {
 void Socket::newSocket() {
     fd_ = ::socket(family_, type_, protocol_);
     if (fd_ == -1) {
-        RPC_LOG_ERROR(logger) << "create socket error, errno=" << errno; 
+        RPC_LOG_ERROR(logger) << "create socket error, errno=" << errno << " errstr=" << strerror(errno); 
     } else {
         initSocket();
     }
@@ -104,6 +104,10 @@ bool Socket::isVaild() const {
     return true;
 }
 
+bool Socket::isConnected() const {
+    return is_connected_;
+}
+
 bool Socket::bind(const RPC::Address::ptr address) {
     if (!isVaild()) {
         newSocket();
@@ -118,7 +122,7 @@ bool Socket::bind(const RPC::Address::ptr address) {
 
     int ret = ::bind(fd_, address->getSockAddr(), address->getSockAddrLen());
     if (ret == -1) {
-        RPC_LOG_ERROR(logger) << "socket bind error, errno=" << errno;
+        RPC_LOG_ERROR(logger) << "socket bind error, errno=" << errno << " errstr=" << strerror(errno);
         return false;
     }
     getLocalAddress();
@@ -159,10 +163,12 @@ bool Socket::connect(const RPC::Address::ptr address, uint64_t timeout_ms) {
 
 }
 Socket::ptr Socket::accept() {
+    // RPC_LOG_DEBUG(logger) << "is acceptting";
     int newsock = ::accept(fd_, nullptr, nullptr);
+
     if (newsock < 0) {
-        RPC_LOG_WARN(logger) << "accept(" << fd_ << ") "
-                << "errno=" << errno << "errstr=" << strerror(errno);
+        // RPC_LOG_WARN(logger) << "accept(" << fd_ << ") "
+        //         << "errno=" << errno << "errstr=" << strerror(errno);
         return nullptr;
     }
     Socket::ptr sock = std::make_shared<Socket>(family_, type_, protocol_);
@@ -395,6 +401,8 @@ std::ostream& Socket::dump(std::ostream& os) const {
     os << "]";
     return os;
 }
-
+std::ostream & operator<<(std::ostream& os, const Socket &sock) {
+    return sock.dump(os);
+}
 
 }

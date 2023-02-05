@@ -181,7 +181,7 @@ public:
     uint64_t getReadBuffers(std::vector<iovec> &buffers, uint64_t len, size_t position) const;
     
     /**
-     * @brief 将可写的缓存数据存入buffers
+     * @brief 获取可写入的缓存,保存成iovec数组
      * 容量不足于写入len长度时，扩容
      * @return uint64_t 可写入长度
      */

@@ -97,24 +97,24 @@ public:
     bool listen(int backlog = SOMAXCONN);
     bool close();
     Socket::ptr accept();
-    int recv(void *buff, size_t length, int flag);
-    int recv(iovec *buff, size_t length, int flag);
-    int send(const void *buff, size_t length, int flag);
-    int send(const iovec *buff, size_t length, int flag);
+    int recv(void *buff, size_t length, int flag = 0);
+    int recv(iovec *buff, size_t length, int flag = 0);
+    int send(const void *buff, size_t length, int flag = 0);
+    int send(const iovec *buff, size_t length, int flag = 0);
     /**
      * @brief UDP 接收信息
      */
-    int recvfrom(void *buf, size_t len, Address::ptr source, int flags);
+    int recvfrom(void *buf, size_t len, Address::ptr source, int flags = 0);
     /**
      * @brief UDP 发送信息
      */
-    int sendto(const void *buf, size_t len, const Address::ptr dest, int flags);
+    int sendto(const void *buf, size_t len, const Address::ptr dest, int flags = 0);
     /**
      * @brief 获取本地地址
      * 
      */
-    int recvfrom(iovec *buf, size_t len, Address::ptr source, int flags);
-    int sendto(const iovec *buf, size_t len, const Address::ptr dest, int flags);
+    int recvfrom(iovec *buf, size_t len, Address::ptr source, int flags = 0);
+    int sendto(const iovec *buf, size_t len, const Address::ptr dest, int flags = 0);
 
     Address::ptr getLocalAddress();
     /**
@@ -127,7 +127,7 @@ public:
      * 
      */
     bool isVaild() const;
-
+    bool isConnected() const;
     int getError();
     bool cancelRead();
     bool cancelWrite();
@@ -163,6 +163,8 @@ private:
     Address::ptr local_address_;
     Address::ptr remote_address_;
 }; 
+
+std::ostream & operator<<(std::ostream& os, const Socket &sock);
 }
 
 

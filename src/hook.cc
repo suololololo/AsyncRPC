@@ -281,7 +281,8 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
 
 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen) {
     int fd = do_io(sockfd, RPC::IOManager::READ, "accept", accept_f, addr, addrlen);
-    if (fd >= 0) {
+    // RPC_LOG_DEBUG(logger) << "accept finish, fd = " << fd;
+    if (fd >= 0 && RPC::is_enable_hook()) {
         RPC::FdMgr::GetInstance()->getFdContext(fd, true);
     }
     return fd;
