@@ -10,18 +10,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set (LIB_SRC 
-    src/fiber.cc
-    src/scheduler.cc
-    src/thread.cc
-    src/utils.cc
-    src/log.cc
-    src/byte_array.cc
     src/address.cc
-    src/io_manager.cc
-    src/timer.cc
+    src/byte_array.cc
+    src/fd_manager.cc 
+    src/fiber.cc
     src/hook.cc
-    src/fd_manager.cc
+    src/io_manager.cc
+    src/log.cc
+    src/scheduler.cc
     src/socket.cc
+    src/socket_stream.cc
+    src/stream.cc
+    src/tcp_server.cc
+    src/thread.cc
+    src/timer.cc
+    src/utils.cc
 )
 set(LIB_LIB 
     pthread
@@ -72,3 +75,12 @@ target_link_libraries(test_hook PUBLIC util)
 add_executable(test_socket ${PROJECT_SOURCE_DIR}/test/test_socket.cc)
 target_include_directories(test_socket PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_socket PUBLIC util)
+
+add_executable(test_tcp_server ${PROJECT_SOURCE_DIR}/test/test_tcp_server.cc)
+target_include_directories(test_tcp_server PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_tcp_server PUBLIC util)
+
+
+add_executable(test_echo_server ${PROJECT_SOURCE_DIR}/test/test_echo_server.cc)
+target_include_directories(test_echo_server PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_echo_server PUBLIC util)
