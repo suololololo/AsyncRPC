@@ -77,7 +77,7 @@ void Scheduler::Run() {
         {
             MutexType::Lock lock(mutex_);
             auto it = tasks_.begin();
-            for (auto it = tasks_.begin(); it != tasks_.end(); ++it) {
+            for (it = tasks_.begin(); it != tasks_.end(); ++it) {
                 if (it->thread != -1 && it->thread != GetThreadId()) {
                     // 拿到的协程有指定线程进行执行，且不是当前线程
                     tickle = true;

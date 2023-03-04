@@ -86,6 +86,9 @@ public:
 
     void setSendTimeout(uint64_t time);
     uint64_t getSendTimeout() const;
+    void setRecvTimeout(uint64_t t);
+    uint64_t getRecvTimeout();
+
 
     bool bind(const RPC::Address::ptr address);
     bool connect(const RPC::Address::ptr address, uint64_t timeout_ms = -1);

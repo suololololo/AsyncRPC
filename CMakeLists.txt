@@ -4,7 +4,7 @@ set(CMAKE_C_FLAGS "$ENV{CXXFLAGS} -rdynamic -O3 -fPIC -ggdb -std=c11 -Wall -Wno-
 
 project(RPC VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -17,6 +17,7 @@ set (LIB_SRC
     src/hook.cc
     src/io_manager.cc
     src/log.cc
+    src/mutex.cc
     src/scheduler.cc
     src/socket.cc
     src/socket_stream.cc
@@ -25,6 +26,10 @@ set (LIB_SRC
     src/thread.cc
     src/timer.cc
     src/utils.cc
+    src/rpc/rpc_server.cc
+    src/rpc/rpc_service_registry.cc
+    src/rpc/rpc_session.cc
+
 )
 set(LIB_LIB 
     pthread
@@ -84,3 +89,18 @@ target_link_libraries(test_tcp_server PUBLIC util)
 add_executable(test_echo_server ${PROJECT_SOURCE_DIR}/test/test_echo_server.cc)
 target_include_directories(test_echo_server PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_echo_server PUBLIC util)
+
+
+add_executable(test_rpc_server ${PROJECT_SOURCE_DIR}/test/rpc/test_rpc_server.cc)
+target_include_directories(test_rpc_server PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_rpc_server PUBLIC util)
+
+
+
+add_executable(test_rpc_service_registry ${PROJECT_SOURCE_DIR}/test/rpc/test_rpc_service_registry.cc)
+target_include_directories(test_rpc_service_registry PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_rpc_service_registry PUBLIC util)
+
+add_executable(test_coMutex ${PROJECT_SOURCE_DIR}/test/test_coMutex.cc)
+target_include_directories(test_coMutex PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_coMutex PUBLIC util)

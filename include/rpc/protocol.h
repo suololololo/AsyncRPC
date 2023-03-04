@@ -2,10 +2,12 @@
 #define __PROTOCOL_H__
 #include "byte_array.h"
 #include <string>
+#include <sstream>
 namespace RPC {
 /**
  * @brief refer to https://github.com/zavier-wong/acid/tree/0f45acff75979d4636d217b78cd61fc2b1c01751
- * 
+ * |Fuint8|Fuint8|Fuint8| Fuint32   |Fuint32|
+ * |    |   |   |   |   |   |   |   |   |   |   | 
  * magic + version + type + sequence id + content length
  * 
  */
@@ -26,8 +28,19 @@ public:
         RPC_RESPONSE,      //RPC 通用响应包
         RPC_METHOD_REQUEST,//RPC 方法请求调用
         RPC_METHOD_RESPONSE,//RPC 方法响应
-        RPC_SERVICE_DISCOVER_REQUEST, //RPC 服务注册请求
-        RPC_SERVICE_DISCOVER_RESPONSE //RPC 服务注册响应
+
+        RPC_SERVICE_DISCOVER, //RPC 服务发现请求
+        RPC_SERVICE_DISCOVER_RESPONSE, //RPC 服务发现响应
+        RPC_SERVICE_REGISTER, // 服务注册请求
+        RPC_SERVICE_REGISTER_RESPONSE, // 服务注册请求响应
+
+        RPC_SUBSCRIBE_REQUEST,  //订阅请求
+        RPC_SUBSCRIBE_RESPONSE, // 订阅响应
+
+        RPC_PUBLISH_REQUEST, // 发布请求
+        RPC_PUBLISH_RESPONSE, // 发布响应
+        RPC_PROVIDER,         // 向注册中心声明为RPC服务提供方
+        RPC_CONSUMER,         // 向注册中心声明为RPC服务消费方
     };
 
     static Protocol::ptr Create(MsgType type,  const std::string &content, uint32_t id = 0) {
@@ -35,6 +48,7 @@ public:
         res->setMsgType(type);
         res->setContent(content);
         res->setSequenceId(id);
+        res->setContentLength(content.size());
         return res;
     }
 
@@ -54,8 +68,7 @@ public:
         bt->setPosition(0);
         return bt;
     }
-    void decodeMeta() {
-        ByteArray::ptr bt = std::make_shared<ByteArray>();
+    void decodeMeta(ByteArray::ptr bt) {
         magic_ = bt->readFuint8();
         version_ = bt->readFuint8();
         type_ = bt->readFuint8();   
@@ -73,8 +86,7 @@ public:
         bt->setPosition(0);
         return bt;
     }
-    void decodeMeta() {
-        ByteArray::ptr bt = std::make_shared<ByteArray>();
+    void decode(ByteArray::ptr bt) {
         magic_ = bt->readFuint8();
         version_ = bt->readFuint8();
         type_ = bt->readFuint8();   
@@ -96,6 +108,17 @@ public:
     uint32_t getSequenceId() const { return sequence_id_;}
     uint32_t getContentLength() const { return content_length_;}
     const std::string &getContent() const { return content_;}
+    std::string toString() const {
+        std::stringstream ss;
+        ss << "[ magic=" << magic_
+            << " version=" << version_
+            << " type=" << type_
+            << " id=" << sequence_id_
+            << " length=" << content_length_
+            << " content=" << content_
+            << " ]";
+        return ss.str();
+    }
 private:
     uint8_t magic_ = MAGIC;
     uint8_t version_ = VERSION;
