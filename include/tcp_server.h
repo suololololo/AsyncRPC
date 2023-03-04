@@ -17,13 +17,16 @@ public:
     virtual bool start();
     virtual bool stop();
     virtual void startAccept(Socket::ptr sock);
+    virtual void setName(const std::string &name) { name_ = name;}
+    std::string getName() { return name_;}
 protected:
     virtual void handleClient(Socket::ptr client);
-private:
+protected:
     std::vector<Socket::ptr> socks_;
     IOManager* worker_;
     IOManager* acceptWorker_;
     bool stop_;
+    std::string name_; // 服务器的名称
 };
 
 

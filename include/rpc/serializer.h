@@ -20,6 +20,16 @@ public:
     Serializer(ByteArray::ptr byte_array):byte_array_(byte_array) {
 
     }
+    Serializer(const std::string &content) {
+        byte_array_ = std::make_shared<ByteArray>();
+        writeRowData(&content[0], content.size());
+        reset();
+    }
+    Serializer(const char *content, size_t len) {
+        byte_array_ = std::make_shared<ByteArray>();
+        writeRowData(content, len);
+        reset();       
+    }
     ~Serializer() {
 
     }

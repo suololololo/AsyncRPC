@@ -5,7 +5,7 @@ namespace RPC {
 class Stream {
 public:
     typedef std::shared_ptr<Stream> ptr;
-    virtual ~Stream();
+    virtual ~Stream() {};
     virtual int readFixSize(void *buff, size_t len);
     virtual int readFixSize(ByteArray::ptr ba, size_t len);
     virtual int writeFixSize(const void *buff, size_t len);

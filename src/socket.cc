@@ -76,6 +76,19 @@ uint64_t Socket::getSendTimeout() const {
     return fdctx->getTimeout(SO_SNDTIMEO);
 }
 
+void Socket::setRecvTimeout(uint64_t time) {
+    struct timeval tv = {int(time/1000), int(time % 1000 *1000)};;
+    setOption(SOL_SOCKET, SO_RCVTIMEO, &tv);
+}
+uint64_t Socket::getRecvTimeout() {
+    FdContext::ptr fdctx = RPC::FdMgr::GetInstance()->getFdContext(fd_);
+    if (!fdctx) {
+        RPC_LOG_DEBUG(logger) << "fdContext is not exist";
+        return -1;
+    }
+    return fdctx->getTimeout(SO_RCVTIMEO);    
+}
+
 void Socket::newSocket() {
     fd_ = ::socket(family_, type_, protocol_);
     if (fd_ == -1) {
