@@ -24,7 +24,7 @@ static int64_t DecodeZigzag64(const uint64_t &value) {
 
 
 ByteArray::ByteArray(size_t size):head_(new Node(size)), curr_(head_), base_size_(size), position_(0), 
-    capacity_(size), size_(0), endian_(RPC_BIG_ENDIAN){
+    capacity_(size), size_(0), endian_(RPC_LITTLE_ENDIAN){
 
 }
 ByteArray::~ByteArray() {
