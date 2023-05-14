@@ -1,14 +1,23 @@
 #include "rpc/rpc_server.h"
 #include "rpc/rpc.h"
 #include "log.h"
+#include "hook.h"
 #include <iostream>
 
 namespace RPC {
 static RPC::Logger::ptr logger = RPC_LOG_ROOT();
 static uint64_t s_heartbeat_timeout = 40000;
 
-RPCServer::RPCServer(IOManager* worker, IOManager *acceptWorker):TCPServer(worker, acceptWorker), alive_time_(s_heartbeat_timeout) {
+RPCServer::RPCServer(IOManager* worker, IOManager *acceptWorker):TCPServer(worker, acceptWorker), alive_time_(s_heartbeat_timeout), stop_clean_(false), clean_channel_(1) {
 
+}
+RPCServer::~RPCServer() {
+    {
+        MutexType::Lock lock(mutex_);
+        stop_clean_ = true;
+    }
+    bool join = false;
+    clean_channel_ >> join;
 }
 
 bool RPCServer::bind(Address::ptr address) {
@@ -37,18 +46,49 @@ bool RPCServer::start() {
             }
         }, true);
     }
-    return true;
+
+    /*开启协程定时清理订阅列表*/
+    RPC::IOManager::GetThis()->Submit([this]() {
+        while (!stop_clean_) {
+            sleep(5);
+            MutexType::Lock lock(mutex_);
+            for (auto it = subscribes_.cbegin(); it != subscribes_.cend();) {
+                auto conn = it->second.lock();
+                if (!conn || !conn->isConnected()) {
+                    it = subscribes_.erase(it);
+                } else {
+                    it++;
+                }
+            }
+        }
+        clean_channel_ << true;
+    });
+    return TCPServer::start();
+}
+
+void RPCServer::update(Timer::ptr &heartTimer, Socket::ptr client) {
+    if (!heartTimer) {
+        heartTimer = worker_->addTimer(alive_time_, [client]{
+            RPC_LOG_DEBUG(logger) << "client: "<< *client << " closed";
+            client->close();
+        });
+        return;
+    }
+    heartTimer->reset(alive_time_, true);
 }
 
 void RPCServer::handleClient(Socket::ptr client) {
     RPC_LOG_INFO(logger) << "handle client :" << *client;
     RPCSession::ptr session = std::make_shared<RPCSession>(client);
+    Timer::ptr heartTimer;
+    update(heartTimer, client);
     while(true) {
         Protocol::ptr request = session->recvRequest();
-        if (!request) {
+        if (request == nullptr) {
             break;
         }
         Protocol::ptr response;
+        update(heartTimer, client);
         // HEARTBEAT_PACKET,  //心跳包
         // RPC_REQUEST,       //RPC 通用请求包
         switch (request->getMsgType()) {

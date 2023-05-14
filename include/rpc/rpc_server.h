@@ -6,6 +6,7 @@
 #include "rpc/rpc_session.h"
 #include "rpc/protocol.h"
 #include "rpc/serializer.h"
+#include "channel.h"
 #include "mutex.h"
 namespace RPC {
 /**
@@ -17,7 +18,7 @@ public:
     typedef std::shared_ptr<RPCServer> ptr;
     typedef CoMutex MutexType; 
     RPCServer(IOManager* worker = IOManager::GetThis(), IOManager *acceptWorker = IOManager::GetThis());
-    ~RPCServer() {};
+    ~RPCServer();
     /**
      * @brief 函数注册
      * 
@@ -41,6 +42,36 @@ public:
     bool start() override;
     bool bind(Address::ptr address) override;
     
+    /**
+     * @brief 发布
+     * 
+     * @tparam T 
+     * @param key 
+     * @param data 
+     */
+    template<typename T>
+    void publish(const std::string &key, T data) {
+        {
+            MutexType::Lock lock(mutex_);
+            if (subscribes_.empty()) {
+                return;
+            }
+        }
+        Serializer s;
+        s << key << data;
+        s.reset();
+        Protocol::ptr request = Protocol::Create(Protocol::MsgType::RPC_PUBLISH_REQUEST, s.toString(), 0);
+        MutexType::Lock lock(mutex_);
+        auto range = subscribes_.equal_range(key);
+        for (auto it = range.first; it != range.second; ++it) {
+            auto conn = it->second.lock();
+            if (!conn || !conn->isConnected()) {
+                continue;
+            }
+            conn->sendResponse(request);
+        }
+    }
+
 protected:
     virtual void handleClient(Socket::ptr client) override;
     /**
@@ -79,6 +110,14 @@ protected:
      * @return Serializer 
      */
     Serializer call(const std::string &funName, const std::string &args);
+
+    /**
+     * @brief 维持与客户端的心跳定时器
+     * 
+     * @param heartTimer 
+     * @param client 
+     */
+    void update(Timer::ptr &heartTimer, Socket::ptr client);
 
     /* RPC过程实际调用服务端提供函数的过程 */
     template<typename Fun>
@@ -140,7 +179,10 @@ private:
     uint64_t alive_time_;
     /* 心跳包定时器*/
     Timer::ptr heartTimer_;
+    /*停止清理订阅协程*/
+    bool stop_clean_;
 
+    Channel<bool> clean_channel_;
 };
 
 }
