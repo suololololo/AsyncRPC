@@ -225,11 +225,11 @@ public:
      * 
      */
     void wait(); 
-    // bool waitFor(CoMutex::Lock &lock, uint64_t timeout);
+    bool waitFor(CoMutex::Lock &lock, uint64_t timeout);
 
 private:
     MutexType mutex_;
-    std::queue<std::shared_ptr<Fiber>> waitQueue_;
+    std::set<std::shared_ptr<Fiber>> waitQueue_;
     /* 空定时器，让调度器保持调度不退出*/
     std::shared_ptr<Timer> timer_; 
 };
