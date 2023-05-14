@@ -43,6 +43,7 @@ int main() {
 1.支持以定长的方式写入基础数据类型的读写，包括int8_t, int16_t, int32_t, int64_t, uint8_t, uint16_t, uint32_t, uint64_t等等。同时用varint算法支持以不定长的方式写入。
 2.支持string读写, string序列化格式
 ![avatar](https://raw.githubusercontent.com/suololololo/AsyncRPC/master/img/string.png)
+
 3.支持基本stl容器序列化，包括vector, list, set, map, unordered_set, unordered_map, pair, unordered_multiset,multiset,multimap,unordered_multimap。
 容器序列化格式
 ![avatar](https://raw.githubusercontent.com/suololololo/AsyncRPC/master/img/stl.png)
@@ -108,3 +109,8 @@ int main() {
 * 服务发现
 * 订阅服务注册中心的服务
 * 订阅服务提供方的服务
+
+
+### rpc_client close 存在bug 代码健壮性差
+### rpc_server 在读取session的请求报文失败后，进行publish，会导致段错误
+### rpc_connection_pool 启动有时会出现段错误，重启又不会了
