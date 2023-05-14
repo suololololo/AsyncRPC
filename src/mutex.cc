@@ -45,9 +45,10 @@ void CoCondVar::notify() {
 
     {
         MutexType::Lock lock(mutex_);
-        if (!waitQueue_.empty()) {
-            fiber = waitQueue_.front();
-            waitQueue_.pop();
+        while (waitQueue_.size()) {
+            fiber = *waitQueue_.begin();
+            waitQueue_.erase(waitQueue_.begin());
+            if (fiber) break;
         }
         if (timer_) {
             timer_->cancel();
@@ -64,9 +65,9 @@ void CoCondVar::notifyAll() {
     /*把等待队列中的所有协程取出来执行*/
     MutexType::Lock lock(mutex_);
     while (!waitQueue_.empty()) {
-        Fiber::ptr fiber = waitQueue_.front();
-        waitQueue_.pop();
-        RPC::IOManager::GetThis()->Submit(fiber);
+        Fiber::ptr fiber = *waitQueue_.begin();
+        waitQueue_.erase(waitQueue_.begin());
+        if (fiber) RPC::IOManager::GetThis()->Submit(fiber);
     }
     if (timer_) {
         timer_->cancel();
@@ -78,7 +79,7 @@ void CoCondVar::wait(CoMutex::Lock &lock) {
     Fiber::ptr fiber = Fiber::GetThis();
     {
         MutexType::Lock lock1(mutex_);
-        waitQueue_.push(fiber);
+        waitQueue_.insert(fiber);
         if (!timer_) {
             timer_ = IOManager::GetThis()->addTimer(UINT32_MAX, []{}, true);
         }
@@ -92,7 +93,7 @@ void CoCondVar::wait() {
     Fiber::ptr fiber = Fiber::GetThis();
     {
         MutexType::Lock lock(mutex_);
-        waitQueue_.push(fiber);
+        waitQueue_.insert(fiber);
         if (!timer_) {
             timer_ = IOManager::GetThis()->addTimer(UINT32_MAX, []{}, true); 
         }
@@ -101,25 +102,47 @@ void CoCondVar::wait() {
 
 }
 
-// bool CoCondVar::waitFor(CoMutex::Lock &lock, uint64_t timeout) {
-//     if (timeout == (uint64_t)-1) {
-//         wait(lock);
-//         return true;
-//     }
-//     Fiber::ptr fiber = Fiber::GetThis();
-//     IOManager* iom = IOManager::GetThis();
-//     std::shared_ptr<bool> timeCondtion(new bool{false});
-//     std::weak_ptr<bool> weakptr(timeCondtion);
-//     Timer::ptr timer;
-//     {
-//         MutexType::Lock lock1(mutex_);
-//         waitQueue_.push(fiber);
-//         timer = iom->addConditionTimer(timeout, [weakptr, iom, fiber, this]() mutable{
-//             MutexType::Lock lock(mutex_);
+bool CoCondVar::waitFor(CoMutex::Lock &lock, uint64_t timeout) {
+    if (timeout == (uint64_t)-1) {
+        wait(lock);
+        return true;
+    }
+    Fiber::ptr fiber = Fiber::GetThis();
+    IOManager* iom = IOManager::GetThis();
+    std::shared_ptr<bool> timeCondtion(new bool{false});
+    std::weak_ptr<bool> weakptr(timeCondtion);
+    Timer::ptr timer;
+    {
+        MutexType::Lock lock1(mutex_);
+        waitQueue_.insert(fiber);
+        lock.unlock();
+        timer = iom->addConditionTimer(timeout, [weakptr, iom, fiber, this]() mutable{
+            MutexType::Lock lock(mutex_);
+            auto it = weakptr.lock();
+            if (!it) {
+                return;
+            }
+            *it = true;
+            waitQueue_.erase(fiber);
+            iom->Submit(fiber);
+        }, weakptr);
+    }
 
-//         })
-//     }
-// }
+    Fiber::YieldToHold();
+    {
+        MutexType::Lock lock1(mutex_);
+        if (timer && !(*timeCondtion)) {
+            timer->cancel();
+        }
+        lock.lock();
+        if (*timeCondtion) {
+            return false;
+        }
+        return true;
+    }
+
+
+}
 
 CoSemaphore::CoSemaphore(uint32_t count):num_(count), used_(0) {
 

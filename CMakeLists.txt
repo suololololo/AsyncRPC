@@ -26,10 +26,12 @@ set (LIB_SRC
     src/thread.cc
     src/timer.cc
     src/utils.cc
+    src/rpc/rpc_client.cc
+    src/rpc/rpc_connection_pool.cc
     src/rpc/rpc_server.cc
     src/rpc/rpc_service_registry.cc
     src/rpc/rpc_session.cc
-
+    
 )
 set(LIB_LIB 
     pthread
@@ -104,3 +106,20 @@ target_link_libraries(test_rpc_service_registry PUBLIC util)
 add_executable(test_coMutex ${PROJECT_SOURCE_DIR}/test/test_coMutex.cc)
 target_include_directories(test_coMutex PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(test_coMutex PUBLIC util)
+
+add_executable(test_rpc_client ${PROJECT_SOURCE_DIR}/test/rpc/test_rpc_client.cc)
+target_include_directories(test_rpc_client PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_rpc_client PUBLIC util)
+
+add_executable(test_channel ${PROJECT_SOURCE_DIR}/test/test_channel.cc)
+target_include_directories(test_channel PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_channel PUBLIC util)
+
+add_executable(test_bug ${PROJECT_SOURCE_DIR}/test/test_bug.cc)
+target_include_directories(test_bug PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_bug PUBLIC util)
+
+
+add_executable(test_rpc_connection_pool ${PROJECT_SOURCE_DIR}/test/rpc/test_rpc_connection_pool.cc)
+target_include_directories(test_rpc_connection_pool PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(test_rpc_connection_pool PUBLIC util)
