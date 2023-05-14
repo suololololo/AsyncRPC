@@ -136,6 +136,7 @@ public:
     bool cancelWrite();
     bool cancelAccept();
     bool cancelAll();
+    int getSocket() {return fd_;}
     /**
      * @brief 输出socket相关信息
      * 
