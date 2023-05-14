@@ -34,7 +34,7 @@ public:
         Serializer s;
         s << key <<data;
         s.reset();
-        Protocol::ptr response = Protocol::Create(Protocol::MsgType::RPC_SUBSCRIBE_REQUEST, s.toString());
+        Protocol::ptr response = Protocol::Create(Protocol::MsgType::RPC_PUBLISH_REQUEST, s.toString());
         MutexType::Lock lock(mutex_);
         auto range = subscribe_.equal_range(key);
         for (auto it = range.first; it != range.second; ++it) {
