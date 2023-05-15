@@ -33,7 +33,7 @@ public:
     void unlock() {
         if (lock_) {
             mutex_.unlock();
-            lock_ = true;
+            lock_ = false;
         }
     }
     bool trylock() {
@@ -45,7 +45,7 @@ public:
 
 private:
     T &mutex_;
-    bool lock_;
+    bool lock_ = false;
 
 };
 
