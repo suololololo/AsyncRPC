@@ -5,7 +5,7 @@
 协程调度模型对称调度模型，子协程的调度切换时，必须是由主协程调度，子协程执行完毕后，返回主协程
 
 ```c++
-#include <ucontex>
+#include <ucontext.h>
 #include <iostream>
 ucontext_t ctx[2];
 static void hello() {
@@ -17,12 +17,13 @@ int main() {
     getcontext(&ctx[0]);
     void *stack = malloc(1024);
     // 下一context
-    ctx_.uc_link = nullptr;
+    ctx[0].uc_link = nullptr;
     //运行栈信息
-    ctx_.uc_stack.ss_size = 1024;
-    ctx_.uc_stack.ss_sp = stack;
+    cxt[0].uc_stack.ss_size = 1024;
+    ctx[0].uc_stack.ss_sp = stack;
     /*修改协程上下文，设置入口函数*/
     makecontext(&ctx[0], hello, 0);
+    swapcontext(&ctx[1], &ctx[0]);
     return 0;
 }
 
