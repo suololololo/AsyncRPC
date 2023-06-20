@@ -59,7 +59,7 @@ void Scheduler::Stop() {
 
 void Scheduler::Run() {
     /**
-     * @brief 协程调度函数，线程冲任务队列中取出任务
+     * @brief 协程调度函数，线程从任务队列中取出任务
      * 
      * 
      */
