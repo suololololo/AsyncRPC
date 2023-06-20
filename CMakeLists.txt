@@ -39,10 +39,17 @@ set(LIB_LIB
     )
 
 set(CMAKE_BUILD_TYPE "Debug")
-# file(GLOB_RECURSE SRC_LIST ${PROJECT_SOURCE_DIR}/src/*.cc )
-add_library(util ${LIB_SRC})
+# set(LIBRARY_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/lib")
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install)
+file(GLOB HFILE_LIST ${PROJECT_SOURCE_DIR}/include/*.h )
+file(GLOB HFILE_LIST2 ${PROJECT_SOURCE_DIR}/include/rpc/*.h )
+add_library(util SHARED ${LIB_SRC})
 target_include_directories(util PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_link_libraries(util ${LIB_LIB})
+
+install(TARGETS util LIBRARY DESTINATION lib)
+install(FILES ${HFILE_LIST} DESTINATION include)
+install(FILES ${HFILE_LIST2} DESTINATION include/rpc)
 
 add_executable(test_fiber ${PROJECT_SOURCE_DIR}/test/test_fiber.cc)
 target_include_directories(test_fiber PUBLIC ${PROJECT_SOURCE_DIR}/include)
