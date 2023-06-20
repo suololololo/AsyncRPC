@@ -4,3 +4,7 @@ test/*
 *.dot
 
 .vscode/*
+install/*
+lib/*
+memorandum.txt
+.gitignore
